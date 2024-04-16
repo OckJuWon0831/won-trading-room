@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  backend:
+    container_name: backend
+    restart: always
+    build: backend/
+    env_file:
+      - .env
+    ports:
+      - "5050:5050"
+    networks:
+      - deploy_network
+    depends_on:
+      - db
+
+  frontend:
+    container_name: frontend
+    restart: always
+    build: frontend/
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
+    networks:
+      - deploy_network
+    depends_on:
+      - backend
+
+  db:
+    container_name: stock_db
+    image: mysql:8.0.32
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - stock_db:/var/lib/mysql
+      - ./db_init.sql:/docker-entrypoint-initdb.d/db_init.sql
+    restart: always
+
+networks:
+  deploy_network:
+    driver: bridge
+
+volumes:
+  stock_db:
