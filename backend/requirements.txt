@@ -1,0 +1,7 @@
+flask
+pandas
+pymysql
+SQLAlchemy
+yfinance
+werkzeug
+cryptography

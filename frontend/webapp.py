@@ -11,9 +11,4 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def streamlit_main():
-    st.write("HI! Ock Ju Won")
-
-
-if __name__ == "__main__":
-    streamlit_main()
+st.write("HI! Ock Ju Won")

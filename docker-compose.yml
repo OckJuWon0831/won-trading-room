@@ -29,20 +29,24 @@ services:
 
   db:
     container_name: stock_db
-    image: mysql:8.0.32
+    image: mysql:latest
     ports:
-      - "3306:3306"
+      - "3305:3306"
     env_file:
       - .env
     environment:
-      MYSQL_USER: ${MYSQL_USER}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - stock_db:/var/lib/mysql
       - ./db_init.sql:/docker-entrypoint-initdb.d/db_init.sql
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "stock_db"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - deploy_network
 
 networks:
   deploy_network:
