@@ -1,72 +1,61 @@
 from flask import Flask, request, jsonify
+import numpy as np
+from tool import crawler
+from tool import data_preprocessing
+
 import pandas as pd
 import pymysql
-import pymysql
-from sqlalchemy import create_engine
-import yfinance as yf
-import pandas as pd
 from datetime import datetime
 import os
+import json
+
 
 app = Flask(__name__)
 
+DB_USER = "root"
+DB_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD")
+DB_HOST = "stock_db"
+DB_NAME = os.getenv("MYSQL_DATABASE")
+DB_CHARSET = "utf8mb4"
 
-def crawl_stock_data():
-    DB_USER = "root"
-    DB_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD")
-    DB_HOST = "stock_db"
-    DB_NAME = os.getenv("MYSQL_DATABASE")
-    DB_CHARSET = "utf8mb4"
 
-    engine = create_engine(
-        f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:3306/{DB_NAME}"
-    )
+@app.route("/data/arima-predict", methods=["POST"])
+def get_arima():
+    return 0
+
+
+@app.route("/data/cnn-lstm-predict", methods=["POST"])
+def get_cnn_lstm():
+    return 0
+
+
+@app.route("/data/include-technical-indicators", methods=["POST"])
+def get_data():
+    data = request.get_json()
+    ticker = data.get("ticker").upper()
+
+    if ticker not in ["AAPL", "AMZN", "META", "GOOG", "NFLX"]:
+        return jsonify({"error": "Invalid ticker"}), 400
+
     conn = pymysql.connect(
         user=DB_USER, passwd=DB_PASSWORD, host=DB_HOST, db=DB_NAME, charset=DB_CHARSET
     )
 
-    # Define the tickers and the start date for data retrieval
-    tickers_for_companies = ["AAPL", "GOOG", "META", "NFLX", "AMZN"]
-    start_date = "2009-12-31"
-    end_date = datetime.now().date()
+    sql = f"SELECT * FROM `{ticker}`"
+    df = pd.read_sql(sql, conn)
 
-    for ticker in tickers_for_companies:
-        df = yf.download(ticker, start=start_date, end=end_date)
+    processed_df = data_preprocessing.data_preprocessing(df)
 
-        # Generate SQL query
-        with conn.cursor() as cursor:
-            for index, row in df.iterrows():
-                sql = f"""
-                    INSERT INTO {ticker} (Date, Open, High, Low, Close, `Adj Close`, Volume)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE
-                        Open=VALUES(Open),
-                        High=VALUES(High),
-                        Low=VALUES(Low),
-                        Close=VALUES(Close),
-                        `Adj Close`=VALUES(`Adj Close`),
-                        Volume=VALUES(Volume)
-                """
-                cursor.execute(
-                    sql,
-                    (
-                        index.strftime("%Y-%m-%d"),
-                        row["Open"],
-                        row["High"],
-                        row["Low"],
-                        row["Close"],
-                        row["Adj Close"],
-                        row["Volume"],
-                    ),
-                )
-
-        # Commit the transaction
-        conn.commit()
-
-    # Close the MySQL connection
+    response = processed_df.to_json(orient="records")
     conn.close()
+    return jsonify(json.loads(response))
+
+
+@app.route("/", methods=["POST"])
+def index():
+    crawler.crawl_stock_data()
+    return jsonify({"Success!": "Stock Data crawled"}), 200
 
 
 if __name__ == "__main__":
-    crawl_stock_data()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5050, debug=True)
