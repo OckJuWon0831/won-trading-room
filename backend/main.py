@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import numpy as np
 from tool import crawler
 from tool import data_preprocessing
+import cnn_lstm
 
 import pandas as pd
 import pymysql
@@ -32,9 +33,48 @@ def run_arima():
 
 
 # Using scheduler, it is only conducted once a day
-@app.route("/predict/cnn-lstm-predict", methods=["POST"])
+@app.route("/predict/cnn-lstm-predict", methods=["GET"])
 def run_cnn_lstm():
-    return 0
+    try:
+        data = request.get_json()
+        ticker = data.get("ticker").upper()
+
+        if ticker not in ["AAPL", "AMZN", "META", "GOOG", "NFLX"]:
+            return jsonify({"Error": "Invalid ticker"}), 400
+
+        with engine.begin() as conn:
+            sql = f"SELECT * FROM `{ticker}_processed`"
+            df = pd.read_sql(sql, conn)
+            df["Date"] = pd.to_datetime(df["Date"])  # Date 칼럼을 datetime으로 변환
+            df.set_index("Date", inplace=True)  # Date 칼럼을 인덱스로 설정
+
+        df_dropped = cnn_lstm.correlation_matrix_eval(df)
+        train_X, train_Y, test_X, test_Y = cnn_lstm.data_of_train_test_split(df_dropped)
+        model = cnn_lstm.cnn_lstm()
+        model.fit(
+            train_X,
+            train_Y,
+            validation_data=(test_X, test_Y),
+            epochs=40,
+            batch_size=40,
+            verbose=1,
+            shuffle=False,
+        )
+
+        #
+        #   RESULT_DF is already a processed dataframe
+        #
+        predicted, test_label = cnn_lstm.return_stock_price_prediction(
+            model, train_X, test_X, test_Y, df_dropped
+        )
+        RESULT_DF = cnn_lstm.compare_return_and_sharpe(predicted, test_label)
+        response = RESULT_DF.to_json(orient="columns")
+        return jsonify(json.loads(response))
+
+    except SQLAlchemyError as e:
+        return jsonify({"Error": str(e)}), 500
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 500
 
 
 # Insert processed data in DB server
@@ -68,6 +108,7 @@ def insert_data():
         return jsonify({"Error": str(e)}), 500
 
 
+# Get the raw processed data for each company
 @app.route("/data/include-technical-indicators", methods=["POST"])
 def get_data():
     data = request.get_json()
@@ -90,7 +131,7 @@ def get_data():
     return jsonify(json.loads(response))
 
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["GET"])
 def index():
     crawler.crawl_stock_data()
     return jsonify({"Success": "Stock Data crawled"}), 200

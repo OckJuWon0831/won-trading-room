@@ -5,3 +5,6 @@ SQLAlchemy
 yfinance
 werkzeug
 cryptography
+scikit-learn
+numpy
+tensorflow==2.15.0
