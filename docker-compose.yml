@@ -13,6 +13,8 @@ services:
       - deploy_network
     depends_on:
       - db
+    volumes:
+      - venv_backend:/backend/.venv
 
   frontend:
     container_name: frontend
@@ -26,6 +28,8 @@ services:
       - deploy_network
     depends_on:
       - backend
+    volumes:
+      - venv_frontend:/frontend/.venv
 
   db:
     container_name: stock_db
@@ -54,3 +58,5 @@ networks:
 
 volumes:
   stock_db:
+  venv_backend:
+  venv_frontend:

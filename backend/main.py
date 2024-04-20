@@ -3,6 +3,7 @@ import numpy as np
 from tool import crawler
 from tool import data_preprocessing
 import cnn_lstm
+import arima
 
 import pandas as pd
 import pymysql
@@ -29,7 +30,42 @@ engine = create_engine(DB_URL)
 # Using scheduler, it is only conducted once a day
 @app.route("/predict/arima-predict", methods=["POST"])
 def run_arima():
-    return 0
+    try:
+        data = request.get_json()
+        ticker = data.get("ticker").upper()
+
+        if ticker not in ["AAPL", "AMZN", "META", "GOOG", "NFLX"]:
+            return jsonify({"Error": "Invalid ticker"}), 400
+
+        with engine.begin() as conn:
+            sql = f"SELECT * FROM `{ticker}_processed`"
+            df = pd.read_sql(sql, conn)
+            df["Date"] = pd.to_datetime(df["Date"])
+            df.set_index("Date", inplace=True)
+
+        df = df["Close"]
+        df_dropped = df.dropna()
+        n_diffs = arima.get_n_diffs(df_dropped)
+
+        train_data, test_data = (
+            df_dropped[: int(len(df_dropped) * 0.8)],
+            df_dropped[int(len(df_dropped) * 0.8) :],
+        )
+        arima_model = arima.arima(train_data, n_diffs)
+        fc, upper, lower = arima.forecast(
+            len(test_data), arima_model, test_data.index, data=test_data
+        )
+        # lower_series = pd.Series(lower, index=test_data.index)
+        # upper_series = pd.Series(upper, index=test_data.index)
+
+        RESULT_DF = arima.compare_return_and_sharpe(fc, test_data)
+        response = RESULT_DF.to_json(orient="columns")
+        return jsonify(json.loads(response))
+
+    except SQLAlchemyError as e:
+        return jsonify({"Error": str(e)}), 500
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 500
 
 
 # Using scheduler, it is only conducted once a day
