@@ -81,8 +81,8 @@ def run_cnn_lstm():
         with engine.begin() as conn:
             sql = f"SELECT * FROM `{ticker}_processed`"
             df = pd.read_sql(sql, conn)
-            df["Date"] = pd.to_datetime(df["Date"])  # Date 칼럼을 datetime으로 변환
-            df.set_index("Date", inplace=True)  # Date 칼럼을 인덱스로 설정
+            df["Date"] = pd.to_datetime(df["Date"])
+            df.set_index("Date", inplace=True)
 
         df_dropped = cnn_lstm.correlation_matrix_eval(df)
         train_X, train_Y, test_X, test_Y = cnn_lstm.data_of_train_test_split(df_dropped)
