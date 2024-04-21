@@ -8,13 +8,13 @@ def send_request(url, endpoint, ticker=None, method="post", data=None):
     if method == "post":
         full_url = f"{url}{endpoint}"
         response = requests.post(full_url, data=json.dumps(data), headers=headers)
-        print(f"Sending POST to {full_url} with data {data}")  # 디버깅 정보 출력
+        print(f"Sending POST to {full_url} with data {data}")
     else:
         response = requests.get(url + endpoint, headers=headers)
 
-    print(f"Response Status Code: {response.status_code}")  # 응답 코드 출력
+    print(f"Response Status Code: {response.status_code}")
     if response.status_code != 200:
-        print(f"Failed Response: {response.text}")  # 실패 응답 내용 출력
+        print(f"Failed Response: {response.text}")
 
     return response.json() if response.status_code == 200 else None
 
@@ -27,7 +27,6 @@ def save_to_json(data, ticker, prediction_type):
         return
 
     try:
-        # 현재 경로를 기준으로 데이터 폴더 생성
         data_directory = "/frontend/data"
         os.makedirs(data_directory, exist_ok=True)
         file_path = f"{data_directory}/{ticker}_{prediction_type}.json"
