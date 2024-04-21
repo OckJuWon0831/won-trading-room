@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify, session
 import numpy as np
 from tool import crawler
 from tool import data_preprocessing
-import cnn_lstm
-import arima
+from model import cnn_lstm
+from model import arima
 from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 import pymysql
@@ -70,7 +70,7 @@ def run_arima():
 
 
 # Using scheduler, it is only conducted once a day
-@app.route("/api/predict/cnn-lstm-predict", methods=["GET"])
+@app.route("/api/predict/cnn-lstm-predict", methods=["POST"])
 def run_cnn_lstm():
     try:
         data = request.get_json()
@@ -168,56 +168,56 @@ def get_data():
     return jsonify(json.loads(response))
 
 
-@app.route("/api/register", methods=["POST"])
-def register():
-    user_data = request.get_json()
-    user_id = user_data["ID"]
-    user_pw = generate_password_hash(user_data["PASSWORD"])
-    try:
-        conn = engine.connect()
-        trans = conn.begin()
+# @app.route("/api/register", methods=["POST"])
+# def register():
+#     user_data = request.get_json()
+#     user_id = user_data["ID"]
+#     user_pw = generate_password_hash(user_data["PASSWORD"])
+#     try:
+#         conn = engine.connect()
+#         trans = conn.begin()
 
-        check_user_sql = text("SELECT ID FROM USERS WHERE ID = :id")
-        existing_user = conn.execute(check_user_sql, {"id": user_id}).fetchone()
+#         check_user_sql = text("SELECT ID FROM USERS WHERE ID = :id")
+#         existing_user = conn.execute(check_user_sql, {"id": user_id}).fetchone()
 
-        if existing_user:
-            trans.rollback()
-            conn.close()
-            return (
-                jsonify({"status": "error", "message": "User ID already exists"}),
-                409,
-            )
+#         if existing_user:
+#             trans.rollback()
+#             conn.close()
+#             return (
+#                 jsonify({"status": "error", "message": "User ID already exists"}),
+#                 409,
+#             )
 
-        sql = text("INSERT INTO USERS (ID, PASSWORD) VALUES (:id, :password)")
-        conn.execute(sql, {"id": user_id, "password": user_pw})
-        trans.commit()
-        conn.close()
-        return jsonify({"status": "success"}), 200
-    except Exception as e:
-        trans.rollback()
-        conn.close()
-        return jsonify({"status": "error", "message": str(e)}), 500
+#         sql = text("INSERT INTO USERS (ID, PASSWORD) VALUES (:id, :password)")
+#         conn.execute(sql, {"id": user_id, "password": user_pw})
+#         trans.commit()
+#         conn.close()
+#         return jsonify({"status": "success"}), 200
+#     except Exception as e:
+#         trans.rollback()
+#         conn.close()
+#         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-@app.route("/api/login", methods=["POST"])
-def login():
-    login_data = request.get_json()
-    user_id = login_data["ID"]
-    user_pw = login_data["PASSWORD"]
-    try:
-        with engine.connect() as conn:
-            sql = text("SELECT PASSWORD FROM USERS WHERE ID = :id")
-            result = conn.execute(sql, {"id": user_id}).fetchone()
-            if result and check_password_hash(result[0], user_pw):
-                session["login_user"] = user_id
-                return jsonify({"status": "success"}), 200
-            else:
-                return (
-                    jsonify({"status": "failed", "message": "Invalid credentials"}),
-                    401,
-                )
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+# @app.route("/api/login", methods=["POST"])
+# def login():
+#     login_data = request.get_json()
+#     user_id = login_data["ID"]
+#     user_pw = login_data["PASSWORD"]
+#     try:
+#         with engine.connect() as conn:
+#             sql = text("SELECT PASSWORD FROM USERS WHERE ID = :id")
+#             result = conn.execute(sql, {"id": user_id}).fetchone()
+#             if result and check_password_hash(result[0], user_pw):
+#                 session["login_user"] = user_id
+#                 return jsonify({"status": "success"}), 200
+#             else:
+#                 return (
+#                     jsonify({"status": "failed", "message": "Invalid credentials"}),
+#                     401,
+#                 )
+#     except Exception as e:
+#         return jsonify({"status": "error", "message": str(e)}), 500
 
 
 @app.route("/", methods=["GET"])

@@ -6,9 +6,23 @@ ENV VIRTUAL_ENV=/frontend/.venv
 ENV PATH=${VIRTUAL_ENV}/.local/bin:$PATH
 RUN python -m venv ${VIRTUAL_ENV}
 
+RUN apt-get update && \
+    apt-get install -y cron && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt /frontend/requirements.txt
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-ENTRYPOINT ["streamlit", "run"]
-CMD ["webapp.py"]
+COPY . /frontend/
+
+# Cron 작업 설정
+RUN echo "0 1 * * * cd /frontend && ${VIRTUAL_ENV}/bin/python schedule_requests.py >> /var/log/cron.log 2>&1" | crontab -
+
+RUN echo '#!/bin/bash\n\
+cron\n\
+streamlit run webapp.py\n\
+' > /frontend/entrypoint.sh && \
+    chmod +x /frontend/entrypoint.sh
+
+ENTRYPOINT ["/frontend/entrypoint.sh"]
+CMD []
