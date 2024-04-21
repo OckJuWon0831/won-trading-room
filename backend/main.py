@@ -1,21 +1,22 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 import numpy as np
 from tool import crawler
 from tool import data_preprocessing
 import cnn_lstm
 import arima
-
+from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import text
 
 from datetime import datetime
 import os
 import json
 
-
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 DB_USER = "root"
 DB_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD")
@@ -28,7 +29,7 @@ engine = create_engine(DB_URL)
 
 
 # Using scheduler, it is only conducted once a day
-@app.route("/predict/arima-predict", methods=["POST"])
+@app.route("/api/predict/arima-predict", methods=["POST"])
 def run_arima():
     try:
         data = request.get_json()
@@ -69,7 +70,7 @@ def run_arima():
 
 
 # Using scheduler, it is only conducted once a day
-@app.route("/predict/cnn-lstm-predict", methods=["GET"])
+@app.route("/api/predict/cnn-lstm-predict", methods=["GET"])
 def run_cnn_lstm():
     try:
         data = request.get_json()
@@ -114,7 +115,7 @@ def run_cnn_lstm():
 
 
 # Insert processed data in DB server
-@app.route("/data/insert-processed-data", methods=["POST"])
+@app.route("/api/data/insert-processed-data", methods=["POST"])
 def insert_data():
     try:
         data = request.get_json()
@@ -145,7 +146,7 @@ def insert_data():
 
 
 # Get the raw processed data for each company
-@app.route("/data/include-technical-indicators", methods=["POST"])
+@app.route("/api/data/include-technical-indicators", methods=["POST"])
 def get_data():
     data = request.get_json()
     ticker = data.get("ticker").upper()
@@ -165,6 +166,58 @@ def get_data():
     response = processed_df.to_json(orient="records", date_format="iso")
     conn.close()
     return jsonify(json.loads(response))
+
+
+@app.route("/api/register", methods=["POST"])
+def register():
+    user_data = request.get_json()
+    user_id = user_data["ID"]
+    user_pw = generate_password_hash(user_data["PASSWORD"])
+    try:
+        conn = engine.connect()
+        trans = conn.begin()
+
+        check_user_sql = text("SELECT ID FROM USERS WHERE ID = :id")
+        existing_user = conn.execute(check_user_sql, {"id": user_id}).fetchone()
+
+        if existing_user:
+            trans.rollback()
+            conn.close()
+            return (
+                jsonify({"status": "error", "message": "User ID already exists"}),
+                409,
+            )
+
+        sql = text("INSERT INTO USERS (ID, PASSWORD) VALUES (:id, :password)")
+        conn.execute(sql, {"id": user_id, "password": user_pw})
+        trans.commit()
+        conn.close()
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        trans.rollback()
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    login_data = request.get_json()
+    user_id = login_data["ID"]
+    user_pw = login_data["PASSWORD"]
+    try:
+        with engine.connect() as conn:
+            sql = text("SELECT PASSWORD FROM USERS WHERE ID = :id")
+            result = conn.execute(sql, {"id": user_id}).fetchone()
+            if result and check_password_hash(result[0], user_pw):
+                session["login_user"] = user_id
+                return jsonify({"status": "success"}), 200
+            else:
+                return (
+                    jsonify({"status": "failed", "message": "Invalid credentials"}),
+                    401,
+                )
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 @app.route("/", methods=["GET"])

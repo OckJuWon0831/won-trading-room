@@ -4,6 +4,11 @@ CREATE DATABASE IF NOT EXISTS `stock_db`;
 -- Use the database
 USE `stock_db`;
 
+CREATE TABLE IF NOT EXISTS `USERS` (
+    `ID` VARCHAR(255) PRIMARY KEY,
+    `PASSWORD` VARCHAR(255) NOT NULL
+);
+
 -- Create tables for each ticker if not exists
 CREATE TABLE IF NOT EXISTS `AAPL` (
     `Date` DATE PRIMARY KEY,
