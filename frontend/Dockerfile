@@ -16,11 +16,11 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 COPY . /frontend/
 
 # Cron 작업 설정
-RUN echo "0 1 * * * cd /frontend && ${VIRTUAL_ENV}/bin/python schedule_requests.py >> /var/log/cron.log 2>&1" | crontab -
+RUN echo "0 3 * * * cd /frontend && ${VIRTUAL_ENV}/bin/python schedule_requests.py >> /var/log/cron.log 2>&1" | crontab -
 
 RUN echo '#!/bin/bash\n\
 cron\n\
-streamlit run webapp.py\n\
+streamlit run Home.py\n\
 ' > /frontend/entrypoint.sh && \
     chmod +x /frontend/entrypoint.sh
 

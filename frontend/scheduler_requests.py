@@ -85,5 +85,4 @@ def schedule_requests():
             save_to_json(response_cnn_lstm, ticker, "cnn_lstm")
 
 
-# Call the scheduling function
 schedule_requests()
