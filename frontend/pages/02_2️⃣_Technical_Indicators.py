@@ -39,7 +39,7 @@ def get_technical_indicators(ticker):
         return None
 
 
-selected_ticker = st.sidebar.selectbox("Select a ticker:", ticker_list)
+selected_ticker = st.sidebar.selectbox("Select the ticker among FAANG", ticker_list)
 df = get_technical_indicators(selected_ticker)
 
 
