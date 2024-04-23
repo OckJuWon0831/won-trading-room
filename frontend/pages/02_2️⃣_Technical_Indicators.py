@@ -6,6 +6,8 @@ import datetime
 from indicator_descriptions import IndicatorDescriptions
 import matplotlib.pyplot as plt
 
+last_updated = datetime.datetime.now().strftime("%Y-%m-%d")
+
 plt.style.use("ggplot")
 
 url = "http://backend:5050"
@@ -41,50 +43,50 @@ selected_ticker = st.sidebar.selectbox("Select a ticker:", ticker_list)
 df = get_technical_indicators(selected_ticker)
 
 
-def plot_feature(df):
+def main(df):
 
     descriptions = IndicatorDescriptions().descriptions
 
     st.title(f"🚀 Technical indicators of {selected_ticker}")
+    st.write("These technical indicators were considered as features.")
+
+    components.html(
+        f"""<p style="text-align:right; font-family:'IBM Plex Sans', sans-serif; font-size:0.8rem; color:#585858";>\
+            Last Updated: {last_updated}</p>""",
+        height=30,
+    )
     feature_choices = ["-"] + list(df.columns)
-    st.header("Technical indicators before EDA")
-    feature_choice = st.selectbox(
+    st.sidebar.header("Technical indicators before EDA")
+    feature_choice = st.sidebar.selectbox(
         "Select the feature to see:", feature_choices, index=0
     )
 
     if feature_choice != "-":
         description = descriptions.get(feature_choice, feature_choice)
-        fig, ax = plt.subplots(figsize=(10, 5))
-        df[feature_choice].plot(ax=ax, title=description)
-        st.pyplot(fig)
+        st.subheader(description)
+        st.line_chart(df[feature_choice])
     else:
-        fig, axes = plt.subplots(
-            nrows=len(df.columns), ncols=1, figsize=(10, 5 * len(df.columns))
-        )
-        with st.spinner("Wait for it..."):
-            for ax, column in zip(axes, df.columns):
-                description = descriptions.get(column, column)
-                df[column].plot(ax=ax, title=description)
-            plt.tight_layout()
-            st.pyplot(fig)
-        st.balloons()
-    plot_selected_features(df, feature_choice)
+        for column in df.columns:
+            description = descriptions.get(column, column)
+            st.subheader(description)
+            st.line_chart(df[column])
+    if feature_choice in ["Close", "-"]:
+        plot_features(df, feature_choice)
 
 
-def plot_selected_features(df, feature_choice):
+def plot_features(df, feature_choice):
     if feature_choice == "Close" or feature_choice == "-":
         df["Daily Return"] = df["Close"].pct_change()
-        fig, ax = plt.subplots(figsize=(10, 5))
-        df["Daily Return"].plot(ax=ax, legend=True, linestyle=":", marker="o")
-        ax.set_title("Daily Return")
-        st.pyplot(fig)
+        st.subheader("Daily Return")
+        st.line_chart(df["Daily Return"].dropna())
 
         fig, ax = plt.subplots()
-        ax.hist(df["Daily Return"].dropna(), bins=100, color="red")
+        ax.set_title("Distribution of Daily Returns", fontsize=20)
+        ax.hist(df["Daily Return"].dropna(), bins=80, color="blue")
         ax.set_title("Distribution of Daily Returns")
         ax.set_xlabel("Daily Return")
         ax.set_ylabel("Frequency")
         st.pyplot(fig)
 
 
-plot_feature(df)
+main(df)

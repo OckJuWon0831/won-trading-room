@@ -1,78 +1,74 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from collections import OrderedDict
-import os
-import pickle
 import json
 import datetime
-import requests
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
+# Set the page configuration
+st.set_page_config(page_title="Model Comparison", page_icon="🤺")
 last_updated = datetime.datetime.now().strftime("%Y-%m-%d")
-st.set_page_config(
-    page_title="Model Comparison",
-    page_icon="🤺",
-)
+ticker_list = ["AAPL", "AMZN", "GOOG", "META", "NFLX"]
+model_list = ["ARIMA", "CNN_LSTM"]
+
+stock = st.sidebar.selectbox("Select the ticker among FAANG", ticker_list)
+model_type = st.sidebar.selectbox("Select the model", model_list)
+file_path = f"./data/{stock.upper()}_{model_type.lower()}.json"
 
 
-def timestamp_to_date_updated(timestamp):
-    return datetime.datetime.fromtimestamp(
-        int(timestamp) / 1000, tz=datetime.timezone.utc
-    ).strftime("%Y-%m-%d")
-
-
-@st.cache_data
 def load_and_process_data(file_path, model_type):
     try:
         with open(file_path, "r") as file:
             data = json.load(file)
 
-        if data and isinstance(data, dict) and "Actual_Price" in data:
-            df = pd.DataFrame(
-                list(data["Actual_Price"].items()),
-                columns=["timestamp", "value"],
+        if model_type == "cnn_lstm":
+            actual_df = pd.DataFrame(
+                list(data["Actual_Price"].values()),
+                columns=["Actual Price"],
             )
-            df["timestamp"] = df["timestamp"].apply(
-                lambda x: pd.to_datetime(timestamp_to_date_updated(x))
+            predicted_df = pd.DataFrame(
+                list(data["Predicted_Price"].values()),
+                columns=["Predicted Price"],
             )
         else:
-            df = pd.DataFrame()
+            actual_df = pd.DataFrame(
+                list(data["Actual_Price"].values()),
+                index=pd.to_datetime(
+                    [int(x) / 1000 for x in data["Actual_Price"].keys()], unit="s"
+                ),
+                columns=["Actual Price"],
+            )
+            predicted_df = pd.DataFrame(
+                list(data["Predicted_Price"].values()),
+                index=pd.to_datetime(
+                    [int(x) / 1000 for x in data["Predicted_Price"].keys()], unit="s"
+                ),
+                columns=["Predicted Price"],
+            )
 
-        if model_type == "arima" and not df.empty:
-            df.set_index("timestamp", inplace=True)
-        elif model_type == "cnn_lstm" and not df.empty:
-            df.reset_index(drop=True, inplace=True)
+        df = pd.merge(actual_df, predicted_df, left_index=True, right_index=True)
+        return df
     except Exception as e:
-        st.error(f"Error: {e}")
-        df = pd.DataFrame()
-
-    return df
+        st.error(f"Error loading and processing data: {e}")
 
 
 def main():
     st.title("CNN-LSTM 🆚 ARIMA")
-
+    st.write("Customized Machine Learning Model & Statistical Analysis Model")
     components.html(
         f"""<p style="text-align:right; font-family:'IBM Plex Sans', sans-serif; font-size:0.8rem; color:#585858";>\
             Last Updated: {last_updated}</p>""",
         height=30,
     )
+    df = load_and_process_data(file_path, model_type.lower())
+    st.subheader("Price($) comparisons 💰")
 
-    stock = st.selectbox(
-        "Select the ticker among FAANG", ["AAPL", "AMZN", "GOOG", "META", "NFLX"]
-    )
-    model_type = st.selectbox("Select the model", ["ARIMA", "CNN_LSTM"])
-
-    file_path = f"./data/{stock.upper()}_{model_type.lower()}.json"
-
-    data = load_and_process_data(file_path, model_type.lower())
-
-    if not data.empty and "value" in data.columns:
-        st.line_chart(data["value"])
-    else:
-        st.error("'Actual_Price' field is empty of data")
+    try:
+        st.line_chart(
+            df[["Actual Price", "Predicted Price"]],
+            color=["#ff0000", "#0067a3"],
+        )
+    except Exception as e:
+        st.error(f"Data visualization error: {e}")
 
 
 main()

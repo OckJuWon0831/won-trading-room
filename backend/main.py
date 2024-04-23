@@ -4,7 +4,8 @@ from tool import crawler
 from tool import data_preprocessing
 from model import cnn_lstm
 from model import arima
-from werkzeug.security import generate_password_hash, check_password_hash
+
+# from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 import pymysql
 from sqlalchemy import create_engine
@@ -16,7 +17,7 @@ import os
 import json
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
+# app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 DB_USER = "root"
 DB_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD")
