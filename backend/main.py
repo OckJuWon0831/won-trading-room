@@ -163,7 +163,7 @@ def get_data():
 
     processed_df = data_preprocessing.data_preprocessing(df)
 
-    response = processed_df.to_json(orient="records", date_format="iso")
+    response = processed_df.to_json(orient="records", date_format="epoch")
     conn.close()
     return jsonify(json.loads(response))
 

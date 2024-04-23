@@ -15,8 +15,8 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY . /frontend/
 
-# Cron 작업 설정
-RUN echo "0 3 * * * cd /frontend && ${VIRTUAL_ENV}/bin/python schedule_requests.py >> /var/log/cron.log 2>&1" | crontab -
+# Due to the summer time for U.S. stock market, the market is closed at 4am. 
+RUN echo "0 4 * * * cd /frontend && ${VIRTUAL_ENV}/bin/python schedule_requests.py >> /var/log/cron.log 2>&1" | crontab -
 
 RUN echo '#!/bin/bash\n\
 cron\n\
