@@ -58,7 +58,7 @@ def main(df):
     feature_choices = ["-"] + list(df.columns)
     st.sidebar.header("Technical indicators before EDA")
     feature_choice = st.sidebar.selectbox(
-        "Select the feature to see:", feature_choices, index=0
+        "Select the feature to see", feature_choices, index=0
     )
 
     if feature_choice != "-":
