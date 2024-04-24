@@ -60,6 +60,8 @@ def main(df):
 
         st.subheader("Correlation Heatmap before EDA")
         plt.figure(figsize=(14, 10))
+        # sns.heatmap(df.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+
         plt.imshow(df.corr(), cmap="coolwarm", interpolation="none")
         plt.colorbar()
         plt.xticks(range(len(df.columns)), df.columns, rotation=90)
@@ -69,17 +71,14 @@ def main(df):
 
         st.subheader("Correlation Heatmap after EDA")
         plt.figure(figsize=(14, 10))
+        # sns.heatmap(df_dropped.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+
         plt.imshow(df_dropped.corr(), cmap="coolwarm", interpolation="none")
         plt.colorbar()
         plt.xticks(range(len(df_dropped.columns)), df_dropped.columns, rotation=90)
         plt.yticks(range(len(df_dropped.columns)), df_dropped.columns)
         plt.title("Correlation Heatmap")
         st.pyplot(plt)
-        # st.subheader("Correlation Heatmap after EDA")
-        # plt.figure(figsize=(10, 6))
-        # sns.heatmap(df_dropped.corr(), annot=True, cmap="coolwarm", fmt=".2f")
-        # plt.title("Correlation Heatmap")
-        # st.pyplot(plt)
 
         highly_correlated_features = df_dropped.corr()["Close"].sort_values(
             ascending=False

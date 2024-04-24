@@ -5,8 +5,6 @@ import time
 
 import threading
 
-# ORIGINAL CODE ##
-
 
 def send_request(url, endpoint, ticker=None, method="post", data=None):
     headers = {"Content-Type": "application/json"}
@@ -71,6 +69,10 @@ def schedule_requests():
     crawl_response = send_request(url, "/", method="get")
     if crawl_response:
         print("Stock data crawled successfully.")
+
+    # Before applying multi-threading
+    # for ticker in tickers:
+    #     preprocessing_threaded(url, ticker)
 
     for ticker in tickers:
         thread = threading.Thread(target=preprocessing_threaded, args=(url, ticker))
