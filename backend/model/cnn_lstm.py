@@ -113,16 +113,4 @@ def compare_return_and_sharpe(predicted, test_label):
     ).cumprod()
     results_df["Actual_Cumulative_Return"] = (1 + results_df["Actual_Return"]).cumprod()
 
-    #   PREDICTED, ACTUAL_FIN_RTN & SHARPE_RATIO are simple float numbers
-
-    # predicted_final_return = results_df["Predicted_Cumulative_Return"].iloc[-1]
-    # actual_final_return = results_df["Actual_Cumulative_Return"].iloc[-1]
-    # sharpe_ratio = (
-    #     np.mean(results_df["Predicted_Return"])
-    #     / np.std(results_df["Predicted_Return"])
-    #     * np.sqrt(252.0)
-    # )
-
-    # return results_df, predicted_final_return, actual_final_return, sharpe_ratio
-
     return results_df

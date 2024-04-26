@@ -21,7 +21,6 @@ def timestamp_to_date(timestamp):
     return datetime.datetime.fromtimestamp(int(timestamp) / 1000).strftime("%Y-%m-%d")
 
 
-@st.cache_data
 def get_technical_indicators(ticker):
     response = requests.post(
         url + include_technical_indicators, json={"ticker": ticker}

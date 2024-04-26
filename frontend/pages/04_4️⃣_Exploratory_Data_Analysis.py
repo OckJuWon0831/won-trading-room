@@ -31,7 +31,7 @@ def get_technical_indicators(ticker):
             df.set_index("Date", inplace=True)
         return df
     else:
-        st.error("Failed to retrieve data.")
+        st.error(f"Failed to retrieve data: {response.status_code}, {response.text}")
         return None
 
 

@@ -1,6 +1,6 @@
-streamlit
+streamlit==1.33.0
 numpy
-pandas
-matplotlib
+pandas==2.1.4
+matplotlib==3.8.0
 # aiohttp
 # seaborn
