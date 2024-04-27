@@ -14,10 +14,9 @@ def streamlit_main():
     st.markdown(
         """
         # 📉 Won Trading Room 📈
-        ## COMP3071 Project
+        ## Final Year Project
 
-        20197749
-
+        BSc (Hons) Computer Science with Artificial Intelligence
         Ock Ju Won
 
         """

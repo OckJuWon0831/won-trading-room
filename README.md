@@ -1,10 +1,12 @@
 # WON! Trading Room
 
-## COMP3071 Project
+## FYP Project
 
-20197749
+BSc (Hons) Computer Science with Artificial Intelligence
 
 Ock Ju Won
+
+Address: http://18.139.100.114:8501/
 
 # 멀티쓰레딩 적용
 
