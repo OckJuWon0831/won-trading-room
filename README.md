@@ -1,6 +1,6 @@
 # WON! Trading Room
 
-## FYP Project
+## Final Year Project
 
 BSc (Hons) Computer Science with Artificial Intelligence
 
