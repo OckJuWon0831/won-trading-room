@@ -1,5 +1,5 @@
 # WON! Trading Room
-
+![architecture]("https://github.com/OckJuWon0831/won-trading-room/assets/114837587/110f6692-c723-47ab-9bda-a9752d83a80b")
 ## Final Year Project
 
 BSc (Hons) Computer Science with Artificial Intelligence
