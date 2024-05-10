@@ -24,7 +24,7 @@ Address: http://18.139.100.114:8501/
 7. `docker --version`
 
 ## Installing Docker-compose
-1. `sudo curl -L https://github.com/docker/compose/releases/download/v2.1.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose`
+1. ``sudo curl -L https://github.com/docker/compose/releases/download/v2.1.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose``
 2. `sudo chmod +x /usr/local/bin/docker-compose`
 3. `sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose`
 - If the Docker-compose is successfully installed then the version will be shown.
