@@ -33,6 +33,8 @@ Address: http://18.139.100.114:8501/
 # How to run
 1. `git clone https://github.com/OckJuWon0831/won-trading-room`
 2. Make `.env` file for the MySQL DB connection
+  - `MYSQL_ROOT_PASSWORD="YOUR_PASSWORD"`
+  - `MYSQL_DATABASE="YOUR_DATABASE"`
 4. `sh init.sh` to initiate the containers and load data
 - `docker-compose up --build -d` will be executed
 # Usage
