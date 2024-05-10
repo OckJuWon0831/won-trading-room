@@ -1,13 +1,14 @@
 # WON! Trading Room
+
 ![architecture](https://github.com/OckJuWon0831/won-trading-room/assets/114837587/110f6692-c723-47ab-9bda-a9752d83a80b)
 
 ## Final Year Project
 
-BSc (Hons) Computer Science with Artificial Intelligence
+Comparison of the CNN-LSTM deep learning model(Combined model of CNN and LSTM) and ARIMA(Autoregressive Integrated Moving Average) prediction model on stock market data.
 
-Ock Ju Won
+The data of FAANG(Facebook, Amazon, Apple, Netflix and Google) was crawled from Yahoo Finance API for approximately 15 years, and the models were trained and tested based on the obtained data.
 
-Address: http://18.139.100.114:8501/
+🔗 http://18.139.100.114:8501/
 
 # How to set up
 > ‼️ This application is developed in the Linux operating system.
@@ -53,3 +54,7 @@ Remove the application: `docker-compose down`
 ## Version
 
 ### Version 1.0.0
+
+### BSc (Hons) Computer Science with Artificial Intelligence
+
+### Ock Ju Won
