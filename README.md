@@ -10,6 +10,8 @@ The data of FAANG(Facebook, Amazon, Apple, Netflix and Google) was crawled from 
 
 🔗 http://18.139.100.114:8501/
 
+🔎 [Wiki - Won Trading Room](https://github.com/OckJuWon0831/won-trading-room/wiki)
+
 # How to set up
 > ‼️ This application is developed in the Linux operating system.
 > 
