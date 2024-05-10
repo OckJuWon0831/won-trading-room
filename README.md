@@ -38,7 +38,7 @@ The data of FAANG(Facebook, Amazon, Apple, Netflix and Google) was crawled from 
 2. Make `.env` file for the MySQL DB connection
   - `MYSQL_ROOT_PASSWORD="YOUR_PASSWORD"`
   - `MYSQL_DATABASE="YOUR_DATABASE"`
-4. `sh init.sh` to initiate the containers and load data
+3. `sh init.sh` to initiate the containers and load data
 - `docker-compose up --build -d` will be executed
 # Usage
 
