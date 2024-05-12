@@ -16,6 +16,19 @@ The data of FAANG(Facebook, Amazon, Apple, Netflix and Google) was crawled from 
 > ‼️ This application is developed in the Linux operating system.
 > 
 > ‼️ Using a Virtual Machine or AWS instance is recommended for Windows users
+
+## If you are Windows user...
+> ‼️ It is for the Windows 10 or 11 users
+### Setting up the Linux subsystem on the Windows environment
+1. Enter these commands on the Windows terminal
+- `dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart`
+- `dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`
+2. Install Ubuntu in the local environment
+3. Reset your laptop and launch the Ubuntu application to finish the installation
+4. Set your profiles and update & upgrade.
+- `sudo apt-get update` & `sudo apt-get upgrade`
+
+
 ## Installing Docker
 1. `sudo apt-get update`
 2. `sudo apt-get install apt-transport-https ca-certificates curl software-properties-common`
