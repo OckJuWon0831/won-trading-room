@@ -25,7 +25,11 @@ The data of FAANG(Facebook, Amazon, Apple, Netflix and Google) was crawled from 
 - `dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`
 2. Install Ubuntu in the local environment
 3. Reset your laptop and launch the Ubuntu application to finish the installation
-4. Set your profiles and update & upgrade.
+4. Change WSL to WSL 2 and install WSL 2 x64 update:
+
+🔗 https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+- `wsl --set-default-version 2` 
+5. Set your profiles and update & upgrade.
 - `sudo apt-get update` & `sudo apt-get upgrade`
 
 
