@@ -48,9 +48,9 @@ The data of FAANG(Facebook, Amazon, Apple, Netflix and Google) was crawled from 
 
 # How to run
 1. `git clone https://github.com/OckJuWon0831/won-trading-room`
-2. Make `.env` file for the MySQL DB connection
+2. Make `.env` file for the MySQL DB connection in the directory
   - `MYSQL_ROOT_PASSWORD="YOUR_PASSWORD"`
-  - `MYSQL_DATABASE="YOUR_DATABASE"`
+  - `MYSQL_DATABASE="stock_db"`
 3. `sh init.sh` to initiate the containers and load data
 - `docker-compose up --build -d` will be executed
 # Usage
