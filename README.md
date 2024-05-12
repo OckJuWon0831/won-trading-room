@@ -70,7 +70,7 @@ Remove the application: `docker-compose down`
 
 - if you want to remove the whole data and run from the basic: `docker-compose down -v`
 
-## Version
+# Version
 
 ### Version 1.0.0
 
