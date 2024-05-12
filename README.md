@@ -1,8 +1,8 @@
 # WON! Trading Room
-
 ![architecture](https://github.com/OckJuWon0831/won-trading-room/assets/114837587/110f6692-c723-47ab-9bda-a9752d83a80b)
 
 ## Final Year Project
+### ⭐️ AWS EC2 Ubuntu instance deployed ML application using Docker-compose and Crontab
 
 Comparison of the CNN-LSTM deep learning model(Combined model of CNN and LSTM) and ARIMA(Autoregressive Integrated Moving Average) prediction model on stock market data.
 
